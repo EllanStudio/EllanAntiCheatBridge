@@ -16,8 +16,6 @@ public record PaperSettings(
     boolean vulcan,
     boolean vulcanPunishments,
     boolean grim,
-    boolean minerTrack,
-    boolean cancelMinerTrackLocal,
     long dedupeMillis
 ) {
     public static PaperSettings load(FileConfiguration config) {
@@ -36,8 +34,6 @@ public record PaperSettings(
             config.getBoolean("sources.vulcan", true),
             config.getBoolean("sources.vulcan-punishments", true),
             config.getBoolean("sources.grim", true),
-            config.getBoolean("sources.minertrack", true),
-            config.getBoolean("minertrack.cancel-local-message", true),
             Math.max(0L, config.getLong("network.dedupe-millis", 350L))
         );
     }

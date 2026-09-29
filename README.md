@@ -11,7 +11,6 @@ broadcasts them to staff on every backend server.
 
 - Vulcan `VulcanPostFlagEvent` and `VulcanPunishEvent` support.
 - GrimAC `FlagEvent` support through the official event bus.
-- MinerTrack `minertrack notify` and `mtrack notify` forwarding.
 - Cross-server delivery through Velocity.
 - Per-player `/ellanac alerts` toggle.
 - Permission-based alert visibility.
@@ -100,10 +99,6 @@ sources:
   vulcan: true
   vulcan-punishments: true
   grim: true
-  minertrack: true
-
-minertrack:
-  cancel-local-message: true
 
 network:
   dedupe-millis: 350

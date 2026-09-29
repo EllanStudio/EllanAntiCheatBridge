@@ -6,7 +6,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import studio.ellan.anticheatbridge.protocol.AlertData;
 
 import java.time.Instant;
@@ -28,14 +27,6 @@ final class AlertRenderer {
 
     Component render(AlertData alert) {
         TagResolver resolver = resolver(alert);
-        if ("MinerTrack".equalsIgnoreCase(alert.source())) {
-            return MiniMessage.miniMessage()
-                .deserialize(settings.rawPrefix(), resolver)
-                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(alert.description()))
-                .hoverEvent(HoverEvent.showText(hover(alert, resolver)))
-                .clickEvent(ClickEvent.copyToClipboard(alert.player()));
-        }
-
         return MiniMessage.miniMessage()
             .deserialize(settings.line(), resolver)
             .hoverEvent(HoverEvent.showText(hover(alert, resolver)))

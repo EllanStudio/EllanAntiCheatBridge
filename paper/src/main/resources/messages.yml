@@ -1,6 +1,5 @@
 prefix: "<#68766E>[<#78B7A1>反作弊<#68766E>]  "
 line: "<prefix><#E8EEE9><player><#68766E> › <#D9BC7C><check><type_segment> <#68766E>· <action> <#D9BC7C><vl>"
-raw-prefix: "<prefix>"
 
 hover:
   - "<#68766E>服务器: <#E8EEE9><server>"

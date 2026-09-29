@@ -17,11 +17,6 @@ sources:
   vulcan: true
   vulcan-punishments: true
   grim: true
-  minertrack: true
-
-minertrack:
-  # Cancel MinerTrack's local notify command and let the bridge broadcast it.
-  cancel-local-message: true
 
 network:
   dedupe-millis: 350
