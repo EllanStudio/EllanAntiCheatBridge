@@ -5,6 +5,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import studio.ellan.anticheatbridge.protocol.AlertData;
 
 import java.time.Instant;
@@ -24,6 +25,16 @@ final class AlertRenderer {
     }
 
     static Component render(AlertData alert) {
+        if ("MinerTrack".equalsIgnoreCase(alert.source())) {
+            return Component.empty()
+                .append(Component.text("[", STRUCTURE))
+                .append(Component.text("反作弊", BRAND, TextDecoration.BOLD))
+                .append(Component.text("] ", STRUCTURE))
+                .append(Component.text("[" + alert.server() + "] ", STRUCTURE))
+                .append(LegacyComponentSerializer.legacyAmpersand()
+                    .deserialize(alert.description()));
+        }
+
         String action = switch (alert.action().toUpperCase()) {
             case "PUNISH" -> "已处罚";
             case "SETBACK" -> "回退";
