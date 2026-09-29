@@ -27,8 +27,16 @@ final class VulcanHook {
             return false;
         }
 
-        boolean postFlag = register("me.frep.vulcan.api.event.VulcanPostFlagEvent", false);
-        boolean punish = register("me.frep.vulcan.api.event.VulcanPunishEvent", true);
+        boolean postFlag = register(
+            vulcan.getClass().getClassLoader(),
+            "me.frep.vulcan.api.event.VulcanPostFlagEvent",
+            false
+        );
+        boolean punish = register(
+            vulcan.getClass().getClassLoader(),
+            "me.frep.vulcan.api.event.VulcanPunishEvent",
+            true
+        );
         enabled = postFlag || punish;
         if (enabled) {
             plugin.getLogger().info("Vulcan hook enabled (postFlag=" + postFlag + ", punish=" + punish + ").");
@@ -40,8 +48,8 @@ final class VulcanHook {
         return enabled;
     }
 
-    private boolean register(String className, boolean punishment) {
-        Class<?> raw = ReflectionUtil.findClass(className);
+    private boolean register(ClassLoader classLoader, String className, boolean punishment) {
+        Class<?> raw = ReflectionUtil.findClass(className, classLoader);
         if (raw == null || !Event.class.isAssignableFrom(raw)) {
             return false;
         }

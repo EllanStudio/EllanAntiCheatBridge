@@ -32,10 +32,10 @@ final class GrimHook {
             return;
         }
         registering = true;
-        tryRegister(0);
+        tryRegister(grim.getClass().getClassLoader(), 0);
     }
 
-    private void tryRegister(int attempt) {
+    private void tryRegister(ClassLoader classLoader, int attempt) {
         if (enabled) {
             registering = false;
             return;
@@ -47,16 +47,24 @@ final class GrimHook {
         }
 
         try {
-            Class<?> apiClass = Class.forName("ac.grim.grimac.GrimAPI");
+            Class<?> apiClass = Class.forName("ac.grim.grimac.GrimAPI", false, classLoader);
             Object api = ReflectionUtil.staticField(apiClass, "INSTANCE");
             if (api == null) {
-                scheduleRetry(attempt);
+                scheduleRetry(classLoader, attempt);
                 return;
             }
 
             Object eventBus = api.getClass().getMethod("getEventBus").invoke(api);
-            Class<?> flagClass = Class.forName("ac.grim.grimac.api.event.events.FlagEvent");
-            Class<?> listenerClass = Class.forName("ac.grim.grimac.api.event.GrimEventListener");
+            Class<?> flagClass = Class.forName(
+                "ac.grim.grimac.api.event.events.FlagEvent",
+                false,
+                classLoader
+            );
+            Class<?> listenerClass = Class.forName(
+                "ac.grim.grimac.api.event.GrimEventListener",
+                false,
+                classLoader
+            );
             Object listener = Proxy.newProxyInstance(
                 listenerClass.getClassLoader(),
                 new Class<?>[]{listenerClass},
@@ -88,14 +96,14 @@ final class GrimHook {
             registering = false;
             plugin.getLogger().info("Grim hook enabled.");
         } catch (ReflectiveOperationException | LinkageError exception) {
-            scheduleRetry(attempt);
+            scheduleRetry(classLoader, attempt);
         }
     }
 
-    private void scheduleRetry(int attempt) {
+    private void scheduleRetry(ClassLoader classLoader, int attempt) {
         plugin.getServer().getScheduler().runTaskLater(
             plugin,
-            () -> tryRegister(attempt + 1),
+            () -> tryRegister(classLoader, attempt + 1),
             20L
         );
     }

@@ -15,6 +15,14 @@ final class ReflectionUtil {
         }
     }
 
+    static Class<?> findClass(String name, ClassLoader classLoader) {
+        try {
+            return Class.forName(name, false, classLoader);
+        } catch (ClassNotFoundException ignored) {
+            return null;
+        }
+    }
+
     static Object staticField(Class<?> owner, String fieldName) {
         try {
             Field field = owner.getField(fieldName);
