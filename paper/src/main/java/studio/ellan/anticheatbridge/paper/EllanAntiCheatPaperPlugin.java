@@ -78,6 +78,10 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
     }
 
     public void report(AlertData alert, Player transportPlayer) {
+        if (!Bukkit.isPrimaryThread()) {
+            getServer().getScheduler().runTask(this, () -> report(alert, transportPlayer));
+            return;
+        }
         PaperSettings current = settings;
         if (current == null || !accept(alert)) {
             return;
