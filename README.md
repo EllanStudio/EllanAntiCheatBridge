@@ -63,6 +63,9 @@ alert.
 /ellanac test
 ```
 
+`/ellanac reload` reloads both `config.yml` and `messages.yml` without restarting
+the backend.
+
 ### Velocity
 
 ```text

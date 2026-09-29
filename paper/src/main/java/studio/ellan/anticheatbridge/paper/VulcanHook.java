@@ -101,8 +101,22 @@ final class VulcanHook {
             ReflectionUtil.string(event, "getInfo", ""),
             violations,
             maxViolations,
+            plugin.getServer().getTPS()[0],
+            player.getPing(),
+            emptyIfNull(player.getClientBrandName()),
+            "",
+            pluginVersion("Vulcan"),
             ReflectionUtil.bool(check, "isExperimental", false)
         );
         plugin.report(alert, player);
+    }
+
+    private String pluginVersion(String pluginName) {
+        org.bukkit.plugin.Plugin installed = plugin.getServer().getPluginManager().getPlugin(pluginName);
+        return installed == null ? "" : installed.getDescription().getVersion();
+    }
+
+    private String emptyIfNull(String value) {
+        return value == null ? "" : value;
     }
 }

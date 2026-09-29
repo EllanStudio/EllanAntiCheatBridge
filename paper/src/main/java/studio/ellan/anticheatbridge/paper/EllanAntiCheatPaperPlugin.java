@@ -25,6 +25,8 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
     private final Set<UUID> alertsDisabled = ConcurrentHashMap.newKeySet();
     private final Map<String, Long> recentAlerts = new ConcurrentHashMap<>();
     private PaperSettings settings;
+    private MessageSettings messages;
+    private AlertRenderer renderer;
     private VulcanHook vulcanHook;
     private GrimHook grimHook;
     private MinerTrackHook minerTrackHook;
@@ -32,7 +34,10 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        saveResource("messages.yml", false);
         settings = PaperSettings.load(getConfig());
+        messages = MessageSettings.load(this);
+        renderer = new AlertRenderer(messages);
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, BridgeProtocol.CHANNEL);
         getServer().getMessenger().registerIncomingPluginChannel(
@@ -157,7 +162,7 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
                 || !online.hasPermission(current.permission())) {
                 continue;
             }
-            online.sendMessage(AlertRenderer.render(alert));
+            online.sendMessage(renderer.render(alert));
         }
         getLogger().info("[AntiCheatBridge] " + alert.server() + " " + alert.source() + " "
             + alert.player() + " " + alert.check() + " VL=" + alert.violations());
@@ -203,6 +208,8 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
                 }
                 reloadConfig();
                 settings = PaperSettings.load(getConfig());
+                messages = MessageSettings.load(this);
+                renderer = new AlertRenderer(messages);
                 sender.sendMessage("§8[§6艾尔岚反作弊§8] §a配置已重载。");
                 return true;
             }
@@ -226,6 +233,13 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
                     "这是一条测试消息。",
                     3.0,
                     10.0,
+                    Bukkit.getTPS()[0],
+                    player == null ? 0 : player.getPing(),
+                    player == null || player.getClientBrandName() == null
+                        ? ""
+                        : player.getClientBrandName(),
+                    "",
+                    "Bridge",
                     false
                 );
                 display(alert);

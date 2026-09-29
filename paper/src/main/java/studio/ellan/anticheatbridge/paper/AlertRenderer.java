@@ -3,96 +3,107 @@ package studio.ellan.anticheatbridge.paper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import studio.ellan.anticheatbridge.protocol.AlertData;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 final class AlertRenderer {
-    private static final TextColor STRUCTURE = TextColor.fromHexString("#68766E");
-    private static final TextColor BRAND = TextColor.fromHexString("#78B7A1");
-    private static final TextColor TEXT = TextColor.fromHexString("#E8EEE9");
-    private static final TextColor VALUE = TextColor.fromHexString("#D9BC7C");
-
     private static final DateTimeFormatter TIME_FORMAT =
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
 
-    private AlertRenderer() {
+    private final MessageSettings settings;
+
+    AlertRenderer(MessageSettings settings) {
+        this.settings = settings;
     }
 
-    static Component render(AlertData alert) {
+    Component render(AlertData alert) {
+        TagResolver resolver = resolver(alert);
         if ("MinerTrack".equalsIgnoreCase(alert.source())) {
-            return Component.empty()
-                .append(Component.text("[", STRUCTURE))
-                .append(Component.text("反作弊", BRAND, TextDecoration.BOLD))
-                .append(Component.text("] ", STRUCTURE))
-                .append(Component.text("[" + alert.server() + "] ", STRUCTURE))
-                .append(LegacyComponentSerializer.legacyAmpersand()
-                    .deserialize(alert.description()));
+            return MiniMessage.miniMessage()
+                .deserialize(settings.rawPrefix(), resolver)
+                .append(LegacyComponentSerializer.legacyAmpersand().deserialize(alert.description()))
+                .hoverEvent(HoverEvent.showText(hover(alert, resolver)))
+                .clickEvent(ClickEvent.copyToClipboard(alert.player()));
         }
 
-        String action = switch (alert.action().toUpperCase()) {
-            case "PUNISH" -> "已处罚";
-            case "SETBACK" -> "回退";
-            default -> "触发";
-        };
-
-        return Component.empty()
-            .append(Component.text("[", STRUCTURE))
-            .append(Component.text("反作弊", BRAND, TextDecoration.BOLD))
-            .append(Component.text("] ", STRUCTURE))
-            .append(Component.text("[" + alert.server() + "] ", STRUCTURE))
-            .append(Component.text(alert.source() + " ", BRAND))
-            .append(Component.text(alert.player(), TEXT))
-            .append(Component.text(" › ", STRUCTURE))
-            .append(Component.text(alert.check(), VALUE))
-            .append(alert.type().isBlank()
-                ? Component.empty()
-                : Component.text(" (" + alert.type() + ")", STRUCTURE))
-            .append(Component.text(" · " + action + " ", STRUCTURE))
-            .append(Component.text(formatVl(alert), VALUE))
-            .hoverEvent(HoverEvent.showText(hover(alert)))
+        return MiniMessage.miniMessage()
+            .deserialize(settings.line(), resolver)
+            .hoverEvent(HoverEvent.showText(hover(alert, resolver)))
             .clickEvent(ClickEvent.copyToClipboard(alert.player()));
     }
 
-    private static Component hover(AlertData alert) {
-        Component hover = Component.empty()
-            .append(Component.text("来源服务器: ", STRUCTURE))
-            .append(Component.text(alert.server(), TEXT))
-            .append(Component.newline())
-            .append(Component.text("反作弊: ", STRUCTURE))
-            .append(Component.text(alert.source(), BRAND))
-            .append(Component.newline())
-            .append(Component.text("检测: ", STRUCTURE))
-            .append(Component.text(alert.check(), VALUE))
-            .append(alert.type().isBlank()
-                ? Component.empty()
-                : Component.text(" " + alert.type(), TEXT))
-            .append(Component.newline())
-            .append(Component.text("时间: ", STRUCTURE))
-            .append(Component.text(TIME_FORMAT.format(Instant.ofEpochMilli(alert.timestamp())), TEXT));
-
-        if (!alert.description().isBlank()) {
-            hover = hover
-                .append(Component.newline())
-                .append(Component.text("说明: ", STRUCTURE))
-                .append(Component.text(alert.description(), TEXT));
+    private Component hover(AlertData alert, TagResolver resolver) {
+        Component result = Component.empty();
+        boolean first = true;
+        for (String template : settings.hover()) {
+            if ((template.contains("<description>") && alert.description().isBlank())
+                || (template.contains("<verbose>") && alert.verbose().isBlank())) {
+                continue;
+            }
+            if (!first) {
+                result = result.append(Component.newline());
+            }
+            result = result.append(MiniMessage.miniMessage().deserialize(template, resolver));
+            first = false;
         }
-        if (!alert.verbose().isBlank()) {
-            hover = hover
-                .append(Component.newline())
-                .append(Component.text("详情: ", STRUCTURE))
-                .append(Component.text(alert.verbose(), TEXT));
-        }
-        return hover.append(Component.newline())
-            .append(Component.text("点击复制玩家名", STRUCTURE));
+        return result;
     }
 
-    private static String formatVl(AlertData alert) {
+    private TagResolver resolver(AlertData alert) {
+        String typeSegment = alert.type().isBlank()
+            ? ""
+            : " <#68766E>(<#E8EEE9>" + alert.type() + "<#68766E>)";
+
+        return TagResolver.resolver(
+            Placeholder.parsed("prefix", settings.prefix()),
+            Placeholder.unparsed("server", alert.server()),
+            Placeholder.unparsed("source", alert.source()),
+            Placeholder.unparsed("player", alert.player()),
+            Placeholder.unparsed("check", alert.check()),
+            Placeholder.parsed("type_segment", typeSegment),
+            Placeholder.unparsed("action", action(alert.action())),
+            Placeholder.unparsed("vl", formatVl(alert)),
+            Placeholder.unparsed("anti_cheat_version", alert.antiCheatVersion()),
+            Placeholder.unparsed("ping", alert.ping() > 0 ? alert.ping() + "ms" : "未知"),
+            Placeholder.unparsed("tps", String.format(Locale.ROOT, "%.1f", alert.tps())),
+            Placeholder.unparsed("client", clientLabel(alert)),
+            Placeholder.unparsed("type", alert.type()),
+            Placeholder.unparsed("time", TIME_FORMAT.format(Instant.ofEpochMilli(alert.timestamp()))),
+            Placeholder.unparsed("description", alert.description()),
+            Placeholder.unparsed("verbose", alert.verbose())
+        );
+    }
+
+    private String action(String action) {
+        return switch (action.toUpperCase(Locale.ROOT)) {
+            case "PUNISH" -> settings.actions().getOrDefault("punish", "已处罚");
+            case "SETBACK" -> settings.actions().getOrDefault("setback", "回退");
+            default -> settings.actions().getOrDefault("flag", "触发");
+        };
+    }
+
+    private String clientLabel(AlertData alert) {
+        if (alert.clientBrand().isBlank() && alert.clientVersion().isBlank()) {
+            return "未知";
+        }
+        if (alert.clientBrand().isBlank()) {
+            return alert.clientVersion();
+        }
+        if (alert.clientVersion().isBlank()) {
+            return alert.clientBrand();
+        }
+        return alert.clientBrand() + " / " + alert.clientVersion();
+    }
+
+    private String formatVl(AlertData alert) {
         String vl = trim(alert.violations());
         if (alert.maxViolations() > 0) {
             return "VL " + vl + "/" + trim(alert.maxViolations());
@@ -100,9 +111,9 @@ final class AlertRenderer {
         return "VL " + vl;
     }
 
-    private static String trim(double value) {
+    private String trim(double value) {
         return value == Math.rint(value)
             ? Long.toString((long) value)
-            : String.format(java.util.Locale.ROOT, "%.1f", value);
+            : String.format(Locale.ROOT, "%.1f", value);
     }
 }

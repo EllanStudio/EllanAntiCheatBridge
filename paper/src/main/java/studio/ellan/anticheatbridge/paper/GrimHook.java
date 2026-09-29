@@ -134,8 +134,18 @@ final class GrimHook {
             ReflectionUtil.string(event, "getVerbose", ""),
             violations,
             0.0,
+            Bukkit.getTPS()[0],
+            player == null ? 0 : player.getPing(),
+            ReflectionUtil.string(user, "getBrand", ""),
+            ReflectionUtil.string(user, "getVersionName", ""),
+            pluginVersion("GrimAC"),
             ReflectionUtil.bool(check, "isExperimental", false)
         );
         plugin.report(alert, player);
+    }
+
+    private String pluginVersion(String pluginName) {
+        Plugin installed = plugin.getServer().getPluginManager().getPlugin(pluginName);
+        return installed == null ? "" : installed.getDescription().getVersion();
     }
 }

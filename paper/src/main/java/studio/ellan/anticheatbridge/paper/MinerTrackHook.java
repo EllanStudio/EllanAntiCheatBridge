@@ -96,8 +96,20 @@ final class MinerTrackHook implements Listener {
             "",
             999.0,
             0.0,
+            plugin.getServer().getTPS()[0],
+            transport == null ? 0 : transport.getPing(),
+            transport == null || transport.getClientBrandName() == null
+                ? ""
+                : transport.getClientBrandName(),
+            "",
+            pluginVersion("MinerTrack"),
             false
         );
         plugin.report(alert, transport);
+    }
+
+    private String pluginVersion(String pluginName) {
+        org.bukkit.plugin.Plugin installed = plugin.getServer().getPluginManager().getPlugin(pluginName);
+        return installed == null ? "" : installed.getDescription().getVersion();
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 public final class BridgeProtocol {
     public static final String CHANNEL = "ellan:ac_bridge";
     public static final int MAGIC = 0x45414342;
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     private static final int MAX_FIELD_BYTES = 4096;
 
@@ -38,6 +38,11 @@ public final class BridgeProtocol {
             output.writeUTF(limit(alert.verbose()));
             output.writeDouble(alert.violations());
             output.writeDouble(alert.maxViolations());
+            output.writeDouble(alert.tps());
+            output.writeInt(alert.ping());
+            output.writeUTF(limit(alert.clientBrand()));
+            output.writeUTF(limit(alert.clientVersion()));
+            output.writeUTF(limit(alert.antiCheatVersion()));
             output.writeBoolean(alert.experimental());
         }
         return buffer.toByteArray();
@@ -72,12 +77,18 @@ public final class BridgeProtocol {
             String verbose = input.readUTF();
             double violations = input.readDouble();
             double maxViolations = input.readDouble();
+            double tps = input.readDouble();
+            int ping = input.readInt();
+            String clientBrand = input.readUTF();
+            String clientVersion = input.readUTF();
+            String antiCheatVersion = input.readUTF();
             boolean experimental = input.readBoolean();
 
             return new Envelope(
                 types[typeOrdinal],
                 new AlertData(id, timestamp, server, source, action, player, playerId,
-                    check, type, description, verbose, violations, maxViolations, experimental)
+                    check, type, description, verbose, violations, maxViolations, tps, ping,
+                    clientBrand, clientVersion, antiCheatVersion, experimental)
             );
         }
     }

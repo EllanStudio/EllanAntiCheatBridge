@@ -1,0 +1,19 @@
+prefix: "<#68766E>[<#78B7A1>反作弊<#68766E>]  "
+line: "<prefix><#68766E>[<#E8EEE9><server><#68766E>] <#78B7A1><source> <#E8EEE9><player><#68766E> › <#D9BC7C><check><type_segment> <#68766E>· <action> <#D9BC7C><vl>"
+raw-prefix: "<prefix><#68766E>[<#E8EEE9><server><#68766E>] "
+
+hover:
+  - "<#68766E>服务器: <#E8EEE9><server>"
+  - "<#68766E>反作弊: <#78B7A1><source> <#E8EEE9><anti_cheat_version>"
+  - "<#68766E>网络: <#E8EEE9><ping> <#68766E>| TPS <#E8EEE9><tps>"
+  - "<#68766E>客户端: <#E8EEE9><client>"
+  - "<#68766E>检测: <#D9BC7C><check> <#E8EEE9><type>"
+  - "<#68766E>时间: <#E8EEE9><time>"
+  - "<#68766E>说明: <#E8EEE9><description>"
+  - "<#68766E>详情: <#E8EEE9><verbose>"
+  - "<#68766E>点击复制玩家名"
+
+actions:
+  flag: "触发"
+  punish: "已处罚"
+  setback: "回退"
