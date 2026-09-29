@@ -1,0 +1,24 @@
+name: EllanAntiCheatBridge
+version: '1.0.0'
+main: studio.ellan.anticheatbridge.paper.EllanAntiCheatPaperPlugin
+api-version: '1.21'
+author: EllanStudio
+description: Cross-server Vulcan and Grim alert bridge.
+softdepend:
+  - Vulcan
+  - GrimAC
+  - packetevents
+
+commands:
+  ellanac:
+    description: Ellan anti-cheat bridge command.
+    usage: /ellanac <status|alerts|reload|test>
+    aliases: [eac]
+
+permissions:
+  ellan.anticheat.notify:
+    description: Receive Ellan anti-cheat alerts.
+    default: op
+  ellan.anticheat.admin:
+    description: Manage Ellan anti-cheat bridge.
+    default: op

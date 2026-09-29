@@ -1,0 +1,11 @@
+{
+  "id": "ellan-anticheat-bridge",
+  "name": "EllanAntiCheatBridge",
+  "version": "1.0.0",
+  "description": "Cross-server Vulcan and Grim alert bridge.",
+  "authors": [
+    "EllanStudio"
+  ],
+  "main": "studio.ellan.anticheatbridge.velocity.EllanAntiCheatVelocityPlugin",
+  "dependencies": []
+}

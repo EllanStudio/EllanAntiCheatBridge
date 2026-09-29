@@ -1,0 +1,22 @@
+server-name: auto
+permission: ellan.anticheat.notify
+
+# Show the alert on the backend that generated it.
+# Keep false when the Velocity bridge is used, otherwise the source server
+# can receive both the native anti-cheat alert and the bridged alert.
+display-locally: false
+
+# Forward locally generated alerts to Velocity for network-wide delivery.
+forward-to-proxy: true
+
+filters:
+  minimum-vl: 1.0
+  ignored-checks: []
+
+sources:
+  vulcan: true
+  vulcan-punishments: true
+  grim: true
+
+network:
+  dedupe-millis: 350
