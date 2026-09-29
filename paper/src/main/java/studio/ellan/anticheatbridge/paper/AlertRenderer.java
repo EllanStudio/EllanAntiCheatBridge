@@ -3,8 +3,8 @@ package studio.ellan.anticheatbridge.paper;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.format.TextColor;
 import studio.ellan.anticheatbridge.protocol.AlertData;
 
 import java.time.Instant;
@@ -12,6 +12,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 final class AlertRenderer {
+    private static final TextColor STRUCTURE = TextColor.fromHexString("#68766E");
+    private static final TextColor BRAND = TextColor.fromHexString("#78B7A1");
+    private static final TextColor TEXT = TextColor.fromHexString("#E8EEE9");
+    private static final TextColor VALUE = TextColor.fromHexString("#D9BC7C");
+
     private static final DateTimeFormatter TIME_FORMAT =
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
 
@@ -19,68 +24,61 @@ final class AlertRenderer {
     }
 
     static Component render(AlertData alert) {
-        NamedTextColor sourceColor = switch (alert.source().toLowerCase()) {
-            case "vulcan" -> NamedTextColor.GOLD;
-            case "grim" -> NamedTextColor.AQUA;
-            default -> NamedTextColor.LIGHT_PURPLE;
-        };
-
         String action = switch (alert.action().toUpperCase()) {
             case "PUNISH" -> "已处罚";
             case "SETBACK" -> "回退";
             default -> "触发";
         };
 
-        Component line = Component.text()
-            .append(Component.text("[", NamedTextColor.DARK_GRAY))
-            .append(Component.text("艾尔岚反作弊", NamedTextColor.GOLD, TextDecoration.BOLD))
-            .append(Component.text("] ", NamedTextColor.DARK_GRAY))
-            .append(Component.text("[" + alert.server() + "] ", NamedTextColor.GREEN))
-            .append(Component.text(alert.source(), sourceColor))
-            .append(Component.text(" ", NamedTextColor.GRAY))
-            .append(Component.text(alert.player(), NamedTextColor.WHITE))
-            .append(Component.text(" › ", NamedTextColor.DARK_GRAY))
-            .append(Component.text(alert.check(), NamedTextColor.AQUA))
+        return Component.empty()
+            .append(Component.text("[", STRUCTURE))
+            .append(Component.text("反作弊", BRAND, TextDecoration.BOLD))
+            .append(Component.text("] ", STRUCTURE))
+            .append(Component.text("[" + alert.server() + "] ", STRUCTURE))
+            .append(Component.text(alert.source() + " ", BRAND))
+            .append(Component.text(alert.player(), TEXT))
+            .append(Component.text(" › ", STRUCTURE))
+            .append(Component.text(alert.check(), VALUE))
             .append(alert.type().isBlank()
                 ? Component.empty()
-                : Component.text(" (" + alert.type() + ")", NamedTextColor.GRAY))
-            .append(Component.text(" · " + action + " ", NamedTextColor.GRAY))
-            .append(Component.text(formatVl(alert), NamedTextColor.RED))
+                : Component.text(" (" + alert.type() + ")", STRUCTURE))
+            .append(Component.text(" · " + action + " ", STRUCTURE))
+            .append(Component.text(formatVl(alert), VALUE))
             .hoverEvent(HoverEvent.showText(hover(alert)))
-            .clickEvent(ClickEvent.copyToClipboard(alert.player()))
-            .build();
-        return line;
+            .clickEvent(ClickEvent.copyToClipboard(alert.player()));
     }
 
     private static Component hover(AlertData alert) {
         Component hover = Component.empty()
-            .append(Component.text("来源服务器: ", NamedTextColor.GRAY))
-            .append(Component.text(alert.server(), NamedTextColor.WHITE))
+            .append(Component.text("来源服务器: ", STRUCTURE))
+            .append(Component.text(alert.server(), TEXT))
             .append(Component.newline())
-            .append(Component.text("反作弊: ", NamedTextColor.GRAY))
-            .append(Component.text(alert.source(), NamedTextColor.WHITE))
+            .append(Component.text("反作弊: ", STRUCTURE))
+            .append(Component.text(alert.source(), BRAND))
             .append(Component.newline())
-            .append(Component.text("检测: ", NamedTextColor.GRAY))
-            .append(Component.text(alert.check() + (alert.type().isBlank() ? "" : " " + alert.type()), NamedTextColor.WHITE))
+            .append(Component.text("检测: ", STRUCTURE))
+            .append(Component.text(alert.check(), VALUE))
+            .append(alert.type().isBlank()
+                ? Component.empty()
+                : Component.text(" " + alert.type(), TEXT))
             .append(Component.newline())
-            .append(Component.text("时间: ", NamedTextColor.GRAY))
-            .append(Component.text(TIME_FORMAT.format(Instant.ofEpochMilli(alert.timestamp())), NamedTextColor.WHITE));
+            .append(Component.text("时间: ", STRUCTURE))
+            .append(Component.text(TIME_FORMAT.format(Instant.ofEpochMilli(alert.timestamp())), TEXT));
 
         if (!alert.description().isBlank()) {
             hover = hover
                 .append(Component.newline())
-                .append(Component.text("说明: ", NamedTextColor.GRAY))
-                .append(Component.text(alert.description(), NamedTextColor.WHITE));
+                .append(Component.text("说明: ", STRUCTURE))
+                .append(Component.text(alert.description(), TEXT));
         }
         if (!alert.verbose().isBlank()) {
             hover = hover
                 .append(Component.newline())
-                .append(Component.text("详情: ", NamedTextColor.GRAY))
-                .append(Component.text(alert.verbose(), NamedTextColor.WHITE));
+                .append(Component.text("详情: ", STRUCTURE))
+                .append(Component.text(alert.verbose(), TEXT));
         }
         return hover.append(Component.newline())
-            .append(Component.text("点击复制玩家名", NamedTextColor.DARK_GRAY))
-            ;
+            .append(Component.text("点击复制玩家名", STRUCTURE));
     }
 
     private static String formatVl(AlertData alert) {
