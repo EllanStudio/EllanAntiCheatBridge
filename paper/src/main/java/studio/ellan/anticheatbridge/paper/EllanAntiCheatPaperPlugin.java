@@ -26,6 +26,7 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
     private final Map<String, Long> recentAlerts = new ConcurrentHashMap<>();
     private PaperSettings settings;
     private MessageSettings messages;
+    private DescriptionTranslator descriptions;
     private AlertRenderer renderer;
     private VulcanHook vulcanHook;
     private GrimHook grimHook;
@@ -37,7 +38,8 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
         saveResource("messages.yml", false);
         settings = PaperSettings.load(getConfig());
         messages = MessageSettings.load(this);
-        renderer = new AlertRenderer(messages);
+        descriptions = DescriptionTranslator.load(this);
+        renderer = new AlertRenderer(messages, descriptions);
 
         getServer().getMessenger().registerOutgoingPluginChannel(this, BridgeProtocol.CHANNEL);
         getServer().getMessenger().registerIncomingPluginChannel(
@@ -209,7 +211,8 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
                 reloadConfig();
                 settings = PaperSettings.load(getConfig());
                 messages = MessageSettings.load(this);
-                renderer = new AlertRenderer(messages);
+                descriptions = DescriptionTranslator.load(this);
+                renderer = new AlertRenderer(messages, descriptions);
                 sender.sendMessage("§8[§6艾尔岚反作弊§8] §a配置已重载。");
                 return true;
             }

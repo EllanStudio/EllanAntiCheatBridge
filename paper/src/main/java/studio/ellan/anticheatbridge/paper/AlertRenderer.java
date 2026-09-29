@@ -19,9 +19,11 @@ final class AlertRenderer {
         DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
 
     private final MessageSettings settings;
+    private final DescriptionTranslator descriptions;
 
-    AlertRenderer(MessageSettings settings) {
+    AlertRenderer(MessageSettings settings, DescriptionTranslator descriptions) {
         this.settings = settings;
+        this.descriptions = descriptions;
     }
 
     Component render(AlertData alert) {
@@ -77,7 +79,7 @@ final class AlertRenderer {
             Placeholder.unparsed("client", clientLabel(alert)),
             Placeholder.unparsed("type", alert.type()),
             Placeholder.unparsed("time", TIME_FORMAT.format(Instant.ofEpochMilli(alert.timestamp()))),
-            Placeholder.unparsed("description", alert.description()),
+            Placeholder.unparsed("description", descriptions.translate(alert)),
             Placeholder.unparsed("verbose", alert.verbose())
         );
     }
