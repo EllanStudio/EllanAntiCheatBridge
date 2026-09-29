@@ -10,6 +10,7 @@ import java.util.Map;
 record MessageSettings(
     String prefix,
     String line,
+    String rawPrefix,
     List<String> hover,
     Map<String, String> actions
 ) {
@@ -26,6 +27,7 @@ record MessageSettings(
                 "<prefix><#E8EEE9><player><#68766E> › "
                     + "<#D9BC7C><check><type_segment> <#68766E>· <action> <#D9BC7C><vl>"
             ),
+            config.getString("raw-prefix", "<prefix>"),
             config.getStringList("hover"),
             Map.of(
                 "flag", config.getString("actions.flag", "触发"),

@@ -30,6 +30,7 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
     private AlertRenderer renderer;
     private VulcanHook vulcanHook;
     private GrimHook grimHook;
+    private MinerTrackHook minerTrackHook;
 
     @Override
     public void onEnable() {
@@ -60,6 +61,11 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
         grimHook = new GrimHook(this);
         if (settings.grim()) {
             grimHook.enable();
+        }
+
+        minerTrackHook = new MinerTrackHook(this);
+        if (settings.minerTrack()) {
+            minerTrackHook.enable();
         }
 
         getLogger().info("Anti-cheat bridge enabled as server '" + serverName() + "'.");
@@ -107,7 +113,8 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
 
     private boolean accept(AlertData alert) {
         PaperSettings current = settings;
-        if (alert.violations() < current.minimumViolationLevel()) {
+        if (!"MinerTrack".equalsIgnoreCase(alert.source())
+            && alert.violations() < current.minimumViolationLevel()) {
             return false;
         }
         String check = alert.check().toLowerCase(Locale.ROOT);
@@ -192,6 +199,7 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
                 sender.sendMessage("§8[§6艾尔岚反作弊§8] §7服务器: §f" + serverName());
                 sender.sendMessage("§8• §7Vulcan hook: §f" + (vulcanHook != null && vulcanHook.isEnabled()));
                 sender.sendMessage("§8• §7Grim hook: §f" + (grimHook != null && grimHook.isEnabled()));
+                sender.sendMessage("§8• §7MinerTrack hook: §f" + (minerTrackHook != null && minerTrackHook.isEnabled()));
                 sender.sendMessage("§8• §7转发到 Velocity: §f" + settings.forwardToProxy());
                 return true;
             }
