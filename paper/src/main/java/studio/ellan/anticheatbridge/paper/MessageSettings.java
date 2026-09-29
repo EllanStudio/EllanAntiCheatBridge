@@ -24,10 +24,10 @@ record MessageSettings(
             config.getString("prefix", "<#68766E>[<#78B7A1><bold>反作弊</bold><#68766E>] "),
             config.getString(
                 "line",
-                "<prefix><#68766E>[<#E8EEE9><server><#68766E>] <#78B7A1><source> <#E8EEE9><player><#68766E> › "
+                "<prefix><#E8EEE9><player><#68766E> › "
                     + "<#D9BC7C><check><type_segment> <#68766E>· <action> <#D9BC7C><vl>"
             ),
-            config.getString("raw-prefix", "<prefix><#68766E>[<#E8EEE9><server><#68766E>] "),
+            config.getString("raw-prefix", "<prefix>"),
             config.getStringList("hover"),
             Map.of(
                 "flag", config.getString("actions.flag", "触发"),

@@ -239,7 +239,7 @@ public final class EllanAntiCheatPaperPlugin extends JavaPlugin implements Comma
                         ? ""
                         : player.getClientBrandName(),
                     "",
-                    "Bridge",
+                    "",
                     false
                 );
                 display(alert);
