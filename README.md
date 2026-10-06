@@ -29,7 +29,7 @@ broadcasts them to staff on every backend server.
 ## Requirements
 
 - Java 25
-- Paper 26.2 or compatible fork
+- Paper 26.3.build.157-beta (or a compatible Paper 26.3 build)
 - Velocity 3.4 or newer
 - Vulcan and/or GrimAC on the backend servers
 
