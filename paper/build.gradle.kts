@@ -10,7 +10,7 @@ java {
 
 dependencies {
     implementation(project(":common"))
-    compileOnly("io.papermc.paper:paper-api:26.2.build.129-stable")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.157-beta")
     compileOnly("net.kyori:adventure-text-minimessage:4.26.1")
 }
 
